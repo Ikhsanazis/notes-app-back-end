@@ -15,3 +15,5 @@ class NotesService {
 
   deleteNoteById(id) {}
 }
+
+module.exports = NotesService;
