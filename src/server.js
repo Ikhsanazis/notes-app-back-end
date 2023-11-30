@@ -1,10 +1,13 @@
-const hapi = require('@hapi/hapi');
-const routes = require('./routes');
+const Hapi = require('@hapi/hapi');
+const notes = require('./api/notes');
+const NotesService = require('./services/inMemory/NotesService');
 
 const init = async () => {
-  const server = hapi.server({
+  const notesService = new NotesService();
+
+  const server = Hapi.server({
     port: 5000,
-    host: 'localhost',
+    host: process.env.NODE_ENV !== 'production' ? 'localhost' : '0.0.0.0',
     routes: {
       cors: {
         origin: ['*'],
@@ -12,7 +15,14 @@ const init = async () => {
     },
   });
 
-  server.route(routes);
+  // server.route(routes);
+
+  await server.register({
+    plugin: notes,
+    option: {
+      service: notesService,
+    },
+  });
 
   await server.start();
   console.log(`server berjalan pada ${server.info.uri}`);
